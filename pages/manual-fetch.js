@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function ManualFetchPage() {
   const [status, setStatus] = useState('');
@@ -9,19 +10,15 @@ export default function ManualFetchPage() {
     setStatus('Fetching data...');
 
     try {
-      const response = await fetch('/api/xero/fetch-trialBalance', {
-        method: 'GET',
-      });
+      const response = await axios.get('/api/xero/fetch-trialBalance');
 
-      if (response.ok) {
-        const data = await response.json();
-        setStatus(`Success: ${data.message}`);
+      if (response.status === 200) {
+        setStatus(`Success: ${response.data.message}`);
       } else {
-        const errorData = await response.json();
-        setStatus(`Error: ${errorData.message}`);
+        setStatus(`Error: ${response.data.message}`);
       }
     } catch (error) {
-      setStatus(`Error: ${error.message}`);
+      setStatus(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
 

@@ -4,17 +4,16 @@ const xero = new XeroClient({
   clientId: process.env.XERO_CLIENT_ID,
   clientSecret: process.env.XERO_CLIENT_SECRET,
   redirectUris: [process.env.XERO_REDIRECT_URI],
-  scopes: 'openid profile email accounting.transactions accounting.reports.read offline_access'.split(' '),
+  scopes: 'accounting.reports.read offline_access'.split(' '),
 });
 
-export async function GET() {
+export async function GET(request) {
   try {
-    // Exchange the authorization code for access and refresh tokens
-    //const tokenSet = await xero.apiCallback(request.url);  // Handles the callback and token exchange
+    const tokenSet = await xero.apiCallback(request.url);
+    xero.setTokenSet(tokenSet);  // Set tokens for future requests
     await xero.updateTenants();
-    const tenantId = xero.tenants[0].tenantId;
 
-    // Fetch trial balance data
+    const tenantId = xero.tenants[0].tenantId;
     const trialBalanceResponse = await xero.accountingApi.getReportTrialBalance(tenantId);
     const trialBalance = trialBalanceResponse.body;
 
@@ -24,3 +23,5 @@ export async function GET() {
     return new Response('Failed to fetch trial balance', { status: 500 });
   }
 }
+
+
