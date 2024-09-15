@@ -1,0 +1,5 @@
+Break up callback route. callback should only handle authentication and the logic for the fetching of the trial should be in fetch-trialBalsnce route.
+Implement Manual Fetch route logic
+Implement cron job logic
+Create an API end point for the PowerBi to access the saved TB.
+Create a fetch for project details. 
