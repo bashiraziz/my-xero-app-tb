@@ -1,29 +1,29 @@
-"Section","Account","Debit","Credit","YTD_Debit","YTD_Credit"
-"Revenue","Sales (400)","","0.00","","28793.18"
-"Expenses","Advertising (600)","0.00","","10453.75",""
-"Expenses","Automobile Expenses (648)","0.00","","708.35",""
-"Expenses","Bank Service Charges (604)","0.00","","30.00",""
-"Expenses","Consulting & Accounting (612)","0.00","","87.00",""
-"Expenses","Cost of Goods Sold (500)","0.00","","2340.00",""
-"Expenses","Dues & Subscriptions (676)","","35.00","1478.78",""
-"Expenses","Entertainment (620)","0.00","","53.60",""
-"Expenses","General Expenses (628)","0.00","","234.19",""
-"Expenses","Janitorial Expenses (608)","0.00","","119.08",""
-"Expenses","Office Expenses (652)","0.00","","212.72",""
-"Expenses","Payroll Tax Expense (672)","0.00","","1337.44",""
-"Expenses","Postage & Delivery (624)","0.00","","125.03",""
-"Expenses","Printing & Stationery (656)","0.00","","100.41",""
-"Expenses","Rent (660)","0.00","","3543.75",""
-"Expenses","Repairs and Maintenance (664)","0.00","","1133.06",""
-"Expenses","Telephone & Internet (680)","0.00","","145.87",""
-"Expenses","Travel (684)","242.00","","276.90",""
-"Expenses","Utilities (644)","0.00","","863.63",""
-"Expenses","Wages and Salaries (668)","0.00","","17885.00",""
-"Assets","Accounts Receivable (120)","0.00","","9172.63",""
-"Assets","Checking Account (090)","","376.35","","5092.83"
-"Assets","Computer Equipment (160)","0.00","","","829.87"
-"Assets","Office Equipment (150)","0.00","","4252.20",""
-"Liabilities","Accounts Payable (200)","169.35","","","10768.63"
-"Liabilities","Historical Adjustment (255)","","0.00","","4130.98"
-"Liabilities","Sales Tax (220)","","0.00","","2655.38"
-"Equity","Retained Earnings (320)","","0.00","","2282.52"
+Section,Account Code,Account Name,Debit,Credit,YTD Debit,YTD Credit
+Revenue,400,Sales,,0.00,,28793.18
+Expenses,600,Advertising,0.00,,10453.75,
+Expenses,648,Automobile Expenses,0.00,,708.35,
+Expenses,604,Bank Service Charges,0.00,,30.00,
+Expenses,612,Consulting & Accounting,0.00,,87.00,
+Expenses,500,Cost of Goods Sold,0.00,,2340.00,
+Expenses,676,Dues & Subscriptions,,35.00,1478.78,
+Expenses,620,Entertainment,0.00,,53.60,
+Expenses,628,General Expenses,0.00,,234.19,
+Expenses,608,Janitorial Expenses,0.00,,119.08,
+Expenses,652,Office Expenses,0.00,,212.72,
+Expenses,672,Payroll Tax Expense,0.00,,1337.44,
+Expenses,624,Postage & Delivery,0.00,,125.03,
+Expenses,656,Printing & Stationery,0.00,,100.41,
+Expenses,660,Rent,0.00,,3543.75,
+Expenses,664,Repairs and Maintenance,0.00,,1133.06,
+Expenses,680,Telephone & Internet,0.00,,145.87,
+Expenses,684,Travel,242.00,,276.90,
+Expenses,644,Utilities,0.00,,863.63,
+Expenses,668,Wages and Salaries,0.00,,17885.00,
+Assets,120,Accounts Receivable,0.00,,9172.63,
+Assets,090,Checking Account,,376.35,,5092.83
+Assets,160,Computer Equipment,0.00,,,829.87
+Assets,150,Office Equipment,0.00,,4252.20,
+Liabilities,200,Accounts Payable,169.35,,,10768.63
+Liabilities,255,Historical Adjustment,,0.00,,4130.98
+Liabilities,220,Sales Tax,,0.00,,2655.38
+Equity,320,Retained Earnings,,0.00,,2282.52

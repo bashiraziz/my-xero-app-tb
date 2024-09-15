@@ -1,63 +1,67 @@
-import { XeroClient } from 'xero-node';
-import path from 'path';
-import { parse } from 'json2csv';
-import fs from 'fs';
+  import { writeFileSync } from 'fs';
+  import path from 'path';
+  import Papa from 'papaparse'; // For CSV parsing
+  import { XeroClient } from 'xero-node';
 
-const xero = new XeroClient({
-  clientId: process.env.XERO_CLIENT_ID,
-  clientSecret: process.env.XERO_CLIENT_SECRET,
-  redirectUris: [process.env.XERO_REDIRECT_URI],
-  scopes: 'accounting.reports.read offline_access'.split(' '),
-});
+  const xero = new XeroClient({
+    clientId: process.env.XERO_CLIENT_ID,
+    clientSecret: process.env.XERO_CLIENT_SECRET,
+    redirectUris: [process.env.XERO_REDIRECT_URI],
+    scopes: 'accounting.reports.read offline_access'.split(' '),
+  });
 
-export async function GET(request) {
-  try {
-    const tokenSet = await xero.apiCallback(request.url);
-    xero.setTokenSet(tokenSet);  // Set tokens for future requests
-    await xero.updateTenants();
+  export async function GET(request) {
+    try {
+      const tokenSet = await xero.apiCallback(request.url);
+      xero.setTokenSet(tokenSet); // Set tokens for future requests
+      await xero.updateTenants();
 
-    const tenantId = xero.tenants[0].tenantId;
-    const trialBalanceResponse = await xero.accountingApi.getReportTrialBalance(tenantId);
-    const trialBalance = trialBalanceResponse.body;
+      const tenantId = xero.tenants[0].tenantId;
+      const trialBalanceResponse = await xero.accountingApi.getReportTrialBalance(tenantId);
+      const trialBalance = trialBalanceResponse.body;
 
-    // Extract relevant data from the trialBalance object
-    let flattenedData = [];
-    trialBalance.reports[0].rows.forEach(section => {
-      if (section.rowType === 'Section') {
-        const sectionTitle = section.title;
+      const flattenedData = [];
 
-        section.rows.forEach(row => {
-          if (row.rowType === 'Row') {
-            const account = row.cells[0].value;
-            const debit = row.cells[1].value || '';
-            const credit = row.cells[2].value || '';
-            const ytdDebit = row.cells[3].value || '';
-            const ytdCredit = row.cells[4].value || '';
+      // Extract rows from the trial balance
+      trialBalance.reports[0].rows.forEach((section) => {
+        if (section.rowType === 'Section') {
+          section.rows.forEach((row) => {
+            if (row.rowType === 'Row') {
+              const account = row.cells[0].value; // The full account info
+              const debit = row.cells[1].value || ''; // Debit value
+              const credit = row.cells[2].value || ''; // Credit value
+              const ytdDebit = row.cells[3].value || ''; // Year-to-Date Debit
+              const ytdCredit = row.cells[4].value || ''; // Year-to-Date Credit
 
-            flattenedData.push({
-              Section: sectionTitle,
-              Account: account,
-              Debit: debit,
-              Credit: credit,
-              YTD_Debit: ytdDebit,
-              YTD_Credit: ytdCredit
-            });
-          }
-        });
-      }
-    });
+              // Extract account code from the account name (e.g., Sales (400))
+              const accountCodeMatch = account.match(/\((\d+)\)/); // Extract the number in brackets
+              const accountCode = accountCodeMatch ? accountCodeMatch[1] : ''; // Account code
+              const accountName = account.replace(/\(\d+\)/, '').trim(); // Remove the brackets and number
 
-    // Convert the extracted data to CSV
-    const csvFields = ['Section', 'Account', 'Debit', 'Credit', 'YTD_Debit', 'YTD_Credit'];
-    const csv = parse(flattenedData, { fields: csvFields });
+              // Push the parsed data to the flattenedData array
+              flattenedData.push([section.title, accountCode, accountName, debit, credit, ytdDebit, ytdCredit]);
+            }
+          });
+        }
+      });
 
-    // Save the CSV file
-    const filePath = path.join(process.cwd(), 'data', 'trial_balance.csv');
-    fs.writeFileSync(filePath, csv);
+      // Define CSV headers
+      const headers = ['Section', 'Account Code', 'Account Name', 'Debit', 'Credit', 'YTD Debit', 'YTD Credit'];
 
-    return new Response(JSON.stringify({ message: 'Trial balance saved to CSV.', filePath }), { status: 200 });
-  } catch (error) {
-    console.error('Error fetching trial balance:', error);
-    return new Response(JSON.stringify({ message: 'Error fetching trial balance.', error }), { status: 500 });
+      // Use PapaParse to convert JSON to CSV format
+      const csvData = Papa.unparse({
+        fields: headers,
+        data: flattenedData,
+      });
+
+      // Define file path and save CSV file
+      const filePath = path.join(process.cwd(), 'data', 'trial_balance.csv');
+      writeFileSync(filePath, csvData);
+
+      console.log('Trial balance saved to', filePath);
+      return new Response(JSON.stringify({ message: 'Trial balance fetched and saved to CSV.' }), { status: 200 });
+    } catch (error) {
+      console.error('Error fetching trial balance:', error);
+      return new Response(JSON.stringify({ message: 'Error fetching trial balance', error: error.message }), { status: 500 });
+    }
   }
-}
