@@ -1,4 +1,7 @@
 import { XeroClient } from 'xero-node';
+import path from 'path';
+import { parse } from 'json2csv';
+import fs from 'fs';
 
 const xero = new XeroClient({
   clientId: process.env.XERO_CLIENT_ID,
@@ -17,11 +20,44 @@ export async function GET(request) {
     const trialBalanceResponse = await xero.accountingApi.getReportTrialBalance(tenantId);
     const trialBalance = trialBalanceResponse.body;
 
-    return new Response(JSON.stringify({ message: 'Trial balance fetched', trialBalance }), { status: 200 });
+    // Extract relevant data from the trialBalance object
+    let flattenedData = [];
+    trialBalance.reports[0].rows.forEach(section => {
+      if (section.rowType === 'Section') {
+        const sectionTitle = section.title;
+
+        section.rows.forEach(row => {
+          if (row.rowType === 'Row') {
+            const account = row.cells[0].value;
+            const debit = row.cells[1].value || '';
+            const credit = row.cells[2].value || '';
+            const ytdDebit = row.cells[3].value || '';
+            const ytdCredit = row.cells[4].value || '';
+
+            flattenedData.push({
+              Section: sectionTitle,
+              Account: account,
+              Debit: debit,
+              Credit: credit,
+              YTD_Debit: ytdDebit,
+              YTD_Credit: ytdCredit
+            });
+          }
+        });
+      }
+    });
+
+    // Convert the extracted data to CSV
+    const csvFields = ['Section', 'Account', 'Debit', 'Credit', 'YTD_Debit', 'YTD_Credit'];
+    const csv = parse(flattenedData, { fields: csvFields });
+
+    // Save the CSV file
+    const filePath = path.join(process.cwd(), 'data', 'trial_balance.csv');
+    fs.writeFileSync(filePath, csv);
+
+    return new Response(JSON.stringify({ message: 'Trial balance saved to CSV.', filePath }), { status: 200 });
   } catch (error) {
     console.error('Error fetching trial balance:', error);
-    return new Response('Failed to fetch trial balance', { status: 500 });
+    return new Response(JSON.stringify({ message: 'Error fetching trial balance.', error }), { status: 500 });
   }
 }
-
-
